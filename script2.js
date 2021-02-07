@@ -3,6 +3,10 @@ let poseNet2;
 let poses1 = [];
 let poses2 = [];
 
+let count = 0;
+
+let points = 0;
+
 let video1;
 var video1IsPlaying; 
 
@@ -45,39 +49,31 @@ function draw() {
   image(video1, 0, 0);
   image(video2, 0, 700, 1024, 758);
 
+  count += 1;
+
   // We can call both functions to draw all keypoints and the skeletons
-  getAngles();
+  
+  if (count == 20){
+    getAngles();
+    count = 0;
+  }
+  
 }
 
 // A function to draw ellipses over the detected keypoints
 function getAngles()  {
   // Loop through all the poses detected
-  for (let i = 0; i < poses1.length; i++) {
-    // For each pose detected, loop through all the keypoints
-    let pose = poses1[i].pose;
-    A = pose.leftShoulder;
-    B = pose.leftElbow;
-    C = pose.leftWrist;
-    //console.log(find_angle(A, B, C) * 180 / Math.PI);
-  }
-  for(var k = 0; k < poses2.length; k++) {
-    var pose2 = poses2[k];
-    // filter out poses that do not meet the minimum pose confidence.
-    if (pose2.score >= 0.2) {
-      var keypoints = pose2.keypoints;
-      // draw keypoints
-      for(var j = 0; j < keypoints.length; j++) {
-        var keypoint = keypoints[j];
-        // filter out keypoints that have a low confidence
-        if (keypoint.score > 0.2) {
-          // for wrists, make the part cyan
-          fill(255, 0, 0);
+  if (poses1.length > 0 && poses2.length > 0){
+    
+    var pose1 = poses1[0].pose;
+    var pose2 = poses2[0].pose;
 
-          ellipse(keypoint.position.x, keypoint.position.y, 10, 10,);
-        }
-      }
-    }
+    console.log(checkRightHand(pose1, pose2));
+    points += checkRightHand(pose1, pose2);// + checkRightArm(pose1, pose2) + checkLeftHand(pose1, pose2) + checkLeftArm(pose1, pose2) + checkRightLeg(pose1, pose2) + checkRightFoot(pose1, pose2) + checkLeftLeg(pose1, pose2) + checkLeftFoot(pose1, pose2);
+    document.getElementById("Score").innerHTML = points;
+    console.log(points);
   }
+  
 }
 
 
@@ -106,36 +102,126 @@ function find_angle(A,B,C) {
 }
 
 function checkRightHand(pose1, pose2){
-  A = pose.leftShoulder;
-  B = pose.leftElbow;
-  C = pose.leftWrist;
+  var A1 = pose1.rightShoulder;
+  var B1 = pose1.rightElbow;
+  var C1 = pose1.rightWrist;
+
+  var A2 = pose2.rightShoulder;
+  var B2 = pose2.rightElbow;
+  var C2 = pose2.rightWrist;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  console.log("Here");
+
+  return giveScore(a1, a2);
 }
 
 function checkRightArm(pose1, pose2){
+  A1 = pose1.rightElbow;
+  B1 = pose1.rightShoulder;
+  C1 = pose1.rightHip;
+
+  A2 = pose2.rightElbow;
+  B2 = pose2.rightShoulder;
+  C2 = pose2.rightHip;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 
 }
 
 function checkLeftHand(pose1, pose2){
+  A1 = pose1.leftShoulder;
+  B1 = pose1.leftElbow;
+  C1 = pose1.leftWrist;
 
+  A2 = pose2.leftShoulder;
+  B2 = pose2.leftElbow;
+  C2 = pose2.leftWrist;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 }
 
 function checkLeftArm(pose1, pose2){
+  A1 = pose1.leftElbow;
+  B1 = pose1.leftShoulder;
+  C1 = pose1.leftHip;
 
+  A2 = pose2.leftElbow;
+  B2 = pose2.leftShoulder;
+  C2 = pose2.leftHip;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 }
 
 function checkRightLeg(pose1, pose2){
+  A1 = pose1.rightShoulder;
+  B1 = pose1.rightHip;
+  C1 = pose1.rightKnee;
 
+  A2 = pose2.rightShoulder;
+  B2 = pose2.rightHip;
+  C2 = pose2.rightKnee;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 }
 
 function checkRightFoot(pose1, pose2){
+  A1 = pose1.rightHip;
+  B1 = pose1.rightKnee;
+  C1 = pose1.rightAnkle;
 
+  A2 = pose2.rightHip;
+  B2 = pose2.rightKnee;
+  C2 = pose2.rightAnkle;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 }
 
 function checkLeftLeg(pose1, pose2){
+  A1 = pose1.leftShoulder;
+  B1 = pose1.leftHip;
+  C1 = pose1.leftKnee;
 
+  A2 = pose2.leftShoulder;
+  B2 = pose2.leftHip;
+  C2 = pose2.leftKnee;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 }
 
 function checkLeftFoot(pose1, pose2){
+  A1 = pose1.leftHip;
+  B1 = pose1.leftKnee;
+  C1 = pose1.leftAnkle;
+
+  A2 = pose2.leftHip;
+  B2 = pose2.leftKnee;
+  C2 = pose2.leftAnkle;
+
+  a1 = find_angle(A1, B1, C1);
+  a2 = find_angle(A2, B2, C2);
+
+  return giveScore(a1, a2);
 
 }
 
