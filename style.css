@@ -9,3 +9,11 @@ header {
 }
 </style>
 </head>
+<body>
+<div class = "col-75">
+background-color: white;
+top-margin: 10px;
+	right-margin: 10px;
+	bottom-margin: 10px;
+	left-margin: 10px;
+</body>
